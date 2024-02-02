@@ -63,7 +63,7 @@ int SMPGCColoring::D1_OMP_GM3P_orig(int nT, int&colors, vector<int>&vtxColors) {
     // phase conflicts detection
     tim_detect =- omp_get_wtime();
     conflictQ.resize(Q.size());
-    auto qsize = 0;
+    long qsize = 0;
     #pragma omp parallel
     {
         #pragma omp for
@@ -73,7 +73,8 @@ int SMPGCColoring::D1_OMP_GM3P_orig(int nT, int&colors, vector<int>&vtxColors) {
             for(int iw=vtxPtr[v]; iw!=vtxPtr[v+1]; iw++){ 
                 const auto w = vtxVal[iw];
                 if(v<w && vc == vtxColors[w]) {
-                    auto position =__sync_fetch_and_add(&qsize, 1); //increment the counter
+                    // auto position =__sync_fetch_and_add(&qsize, 1); //increment the counter
+                    auto position=_InterlockedIncrement(&qsize)-1;
                     conflictQ[position] = v;
                     vtxColors[v] = -1;  //Will prevent v from being in conflict in another pairing
                     break;
@@ -146,7 +147,7 @@ int SMPGCColoring::D1_OMP_GMMP_orig(int nT, int&colors, vector<int>&vtxColors) {
     double tim_maxc       =.0;                     // run time
     int    n_loops        = 0;                     // number of iteration 
     int    n_conflicts    = 0;                      // number of conflicts 
-    int    uncolored_nodes= 0;
+    long   uncolored_nodes= 0;
     const int N                = num_nodes();                    // number of vertex
     const int BufSize          = max_degree()+1;         // maxDegree
     const vector<int>& vtxPtr  = get_CSR_ia();     // ia of csr
@@ -195,7 +196,8 @@ int SMPGCColoring::D1_OMP_GMMP_orig(int nT, int&colors, vector<int>&vtxColors) {
             for(int iw=vtxPtr[v]; iw!=vtxPtr[v+1]; iw++) {
                 const auto w = vtxVal[iw];
                 if(v<w && vc==vtxColors[w]){
-                    auto position = __sync_fetch_and_add(&uncolored_nodes, 1);
+                    // auto position = __sync_fetch_and_add(&uncolored_nodes, 1);
+                    auto position = _InterlockedIncrement(&uncolored_nodes)-1;
                     conflictQ[position]=v;
                     vtxColors[v] = -1;
                     break;

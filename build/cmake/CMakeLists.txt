@@ -3,7 +3,7 @@ project(ColPack)
 
 # Set the version number to the *next* release (not to the prevoius release).
 set(COLPACK_VERSION 1.0.11)
-set(COLPACK_ROOT_DIR "../..")   # modify as needed 
+set(COLPACK_ROOT_DIR "../..")   # modify as needed
 # CMake support was added by chrisdembia in 2017 to support building ColPack on
 # Windows with Visual Studio and to supplement autotools. Various parts of the
 # code base, such as the comments in the SampleDrivers files, still expect use
@@ -29,6 +29,9 @@ set(COLPACK_ROOT_DIR "../..")   # modify as needed
 option(ENABLE_EXAMPLES
     "Build the examples in SampleDrivers/Matrix_Compression_and_Recovery." OFF)
     option(ENABLE_OPENMP "Enable OpenMP." ON)
+if (MSVC)
+    set(ENABLE_OPENMP OFF)
+endif ()
 set (CMAKE_CXX_STANDARD 11)
 
 # Configuring variables, etc.
@@ -69,7 +72,7 @@ if(ENABLE_OPENMP)
 endif()
 
 # Define variables to use for organizing the installation.
-include(GNUInstallDirs) 
+include(GNUInstallDirs)
 
 if(WIN32)
     set(COLPACK_INSTALL_CMAKEDIR       ColPack_libs)
